@@ -932,7 +932,18 @@ class CryptoTrader:
                         time.sleep(2)
                     else:
                         raise
-                
+            # 加载目标URL
+            target_url = self.url_entry.get()
+            try:
+                self.driver.get(target_url)
+                WebDriverWait(self.driver, 15).until(
+                    lambda d: d.execute_script('return document.readyState') == 'complete'
+                )
+                self.logger.info(f"✅ 成功加载目标页面: {target_url}")
+            except Exception as e:
+                self.logger.error(f"加载目标页面失败: {str(e)}")
+                return
+
             if self.find_login_button():
                 self.logger.info("未登录,开始登录")
 

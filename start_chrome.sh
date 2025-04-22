@@ -56,7 +56,7 @@ install_driver() {
     mkdir -p "$TMP_DIR"
     cd "$TMP_DIR" || return 1
 
-    for ((i=0; i<5; i++)); do
+    for ((i=1; i<5; i++)); do
         TRY_PATCH=$((PATCH_VERSION - i))
         TRY_VERSION="${BASE_VERSION}.${TRY_PATCH}"
         DRIVER_URL="https://storage.googleapis.com/chrome-for-testing-public/${TRY_VERSION}/mac-arm64/chromedriver-mac-arm64.zip"
@@ -95,11 +95,16 @@ if ! check_driver; then
     fi
 fi
 
+# 更新PATH环境变量
+export PATH="/usr/local/bin:$PATH"
+
 # 启动 Chrome（调试端口）
 echo -e "${GREEN}启动 Chrome 中...${NC}"
 "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
     --remote-debugging-port=9222 \
     --user-data-dir="$HOME/ChromeDebug" \
+    --no-first-run \
+    --no-default-browser-check
     https://polymarket.com/markets/crypto
 
 echo -e "${GREEN}Chrome 已成功启动${NC}"
