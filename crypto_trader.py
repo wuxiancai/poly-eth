@@ -910,12 +910,29 @@ class CryptoTrader:
             except Exception as chrome_e:
                 self.logger.error(f"启动Chrome浏览器失败: {str(chrome_e)}")
 
-            # 等待Chrome启动
-            time.sleep(5)
-            target_url = self.url_entry.get()
-            self.driver.get(target_url)
-            time.sleep(1)
-            
+             # 等待Chrome启动并初始化driver
+            max_retries = 3
+            for attempt in range(max_retries):
+                try:
+                    # 重新初始化driver
+                    chrome_options = Options()
+                    chrome_options.debugger_address = "127.0.0.1:9222"
+                    self.driver = webdriver.Chrome(options=chrome_options)
+                    
+                    # 验证连接
+                    self.driver.get('chrome://version/')  # 测试连接
+                    WebDriverWait(self.driver, 10).until(
+                        lambda d: d.execute_script('return document.readyState') == 'complete'
+                    )
+                    self.logger.info("✅ 浏览器驱动已成功重连")
+                    break
+                except Exception as e:
+                    if attempt < max_retries - 1:
+                        self.logger.warning(f"浏览器连接尝试失败 ({attempt+1}/{max_retries}), 2秒后重试...")
+                        time.sleep(2)
+                    else:
+                        raise
+                
             if self.find_login_button():
                 self.logger.info("未登录,开始登录")
 
