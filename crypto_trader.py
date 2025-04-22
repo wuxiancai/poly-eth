@@ -372,6 +372,23 @@ class CryptoTrader:
         self.doubling_weeks_entry.insert(0, "44")
         ttk.Label(weeks_frame, text="Day's D", style='Red.TLabel').pack(side=tk.LEFT)
 
+        # 交易币种按钮放在trades_frame中
+        ttk.Label(trades_frame, text="Cryptos:", style='Black.TLabel').pack(side=tk.LEFT, padx=(2,2))
+        buttons_frame = ttk.Frame(trades_frame)
+        buttons_frame.pack(side=tk.LEFT, padx=(0,0))
+
+        # 添加搜索BTC周链接按钮
+        self.btc_button = ttk.Button(buttons_frame, text="BTC", 
+                                         command=lambda: self.find_54_coin('BTC'), width=3,
+                                         style='Blue.TButton')
+        self.btc_button.grid(row=1, column=0, padx=2, pady=3)
+
+        # 添加搜索ETH周链接按钮
+        self.eth_button = ttk.Button(buttons_frame, text="ETH", 
+                                         command=lambda: self.find_54_coin('ETH'), width=3,
+                                         style='Blue.TButton')
+        self.eth_button.grid(row=1, column=1, padx=2, pady=3)
+
         # 配置列权重使输入框均匀分布
         for i in range(8):
             settings_container.grid_columnconfigure(i, weight=1)
@@ -3154,7 +3171,7 @@ class CryptoTrader:
             self.start_auto_find_coin_running = False
             self.stop_auto_find_coin()
 
-    def find_54_coin(self):
+    def find_54_coin(self, coin_type):
         """自动找币,线程名:self.auto_find_coin_timer"""
         self.logger.info("✅ 当前没有持仓,开始自动找币")
         try:
@@ -3166,9 +3183,7 @@ class CryptoTrader:
             self.original_window = self.driver.current_window_handle
             
             # 设置搜索关键词
-            coins = [
-                'ETH'
-            ]
+            coins = [coin_type]
             for coin in coins:
                 try:  # 为每个币种添加单独的异常处理
                     if self.login_running:
@@ -3315,11 +3330,12 @@ class CryptoTrader:
             time.sleep(2)  # 等待页面渲染完成
             
             # 设置搜索关键词
-            link_text_map = {
-                'ETH': 'Ethereum Up or Down on'
-                
-            }
-            search_text = link_text_map.get(coin, '')
+            if coin == 'BTC':
+                search_text = 'Bitcoin Up or Down on'
+            elif coin == 'ETH':
+                search_text = 'Ethereum Up or Down on'
+            else:
+                search_text = ''
             
             if not search_text:
                 self.logger.error(f"无效的币种: {coin}")
